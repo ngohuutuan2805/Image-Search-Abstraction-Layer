@@ -4,7 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var http = require('http')
+var https = require('https')
+
 
 
 var index = require('./routes/index');
@@ -27,44 +28,81 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
-//app.use('/api', api)
+app.use('/api', api)
 
-
+/*
 app.get('/saveData',function (req, res, next) {
-    console.log('1')
 
-    http.request({
-      host:"https://cryptic-ridge-9197.herokuapp.com/",
-      path:"api/imagesearch/lolcats%20funny?offset=10",
-      port:9197,
-      header:{
-        'Content-Type': 'application/json'
-      },
-      method:"GET"
-    }, function (res) {
 
-      console.log('2')
-      console.log('Status code: ' + res.statusCode)
-      console.log('Headers: ' + JSON.stringify(res.headers))
-      console.log('Headers: ' + JSON.stringify(res.body))
+  var myRequest = https.request('https://cryptic-ridge-9197.herokuapp.com/api/imagesearch/lolcats%20funny?offset=10', function (response) {
 
-      res.setEncoding('utf8')
+      // console.log('Status code: ' + response.statusCode)
+      // console.log('Headers: ' + JSON.stringify(response.headers))
+      // console.log('Body: ' + JSON.stringify(response.body))
 
-      res.on('data', function (chunk) {
+      response.setEncoding('utf8')
+
+      var data = ""
+
+      response.on('end', function () {
+
+        //console.log('End with data...' + JSON.stringify(data))
+
+        saveToMongodb(data)
+
+        res.send(data.toString())
+
+      })
+
+      response.on('data', function (chunk) {
         console.log('Data...')
-      })
-
-      res.on('error', function (error) {
-        next(error)
+        data += chunk
       })
 
 
-    }).end()
 
+    })
 
+  myRequest.on('error', function (error) {
+      next(error)
+    })
 
-    console.log('3')
+  myRequest.end()
+
 })
+
+function saveToMongodb(data) {
+
+  console.log("Saving data...")
+  // Store iamge array to mongodb
+  var mongoURL = 'mongodb://localhost:27017/ImageSearchAbstractionLayer'
+
+  mongo.connect(mongoURL, function (err, db) {
+
+    if(err){ throw err } else {
+
+      db.createCollection('images', function (err, collection) {
+
+        if(err){ throw err} else {
+
+          console.log("Save data successful")
+          var imageArr = JSON.parse(data)
+          collection.insert(imageArr)
+
+        }
+
+      })
+    }
+
+  })
+
+}
+*/
+
+
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
