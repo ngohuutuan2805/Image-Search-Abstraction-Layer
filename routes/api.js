@@ -6,7 +6,7 @@ var mongo = require('mongodb').MongoClient
 var Bing = require('node-bing-api')({ accKey: "8805a5c8bfe94e38924aea9d3dda07b5" });
 
 // Connect to database
-var mongoURL = 'mongodb://localhost:27017/ImageSearchAbstractionLayer'
+var mongoURL = process.env.MONGODB_URI
 var database = null;
 
 mongo.connect(mongoURL, function (err, db) {
@@ -35,7 +35,6 @@ router.get('/imagesearch/:keyword', function (request, response, next) {
     // console.log('Offset: ' + offset)
     // console.log('Time: ' + date)
     // console.log('Time to locate string: ' + date.toLocaleString())
-
 
     var conllection = database.collection('images')
 

@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var https = require('https')
 
+require('dotenv').load()
 
 
 var index = require('./routes/index');
